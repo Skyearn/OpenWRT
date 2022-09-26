@@ -1,0 +1,75 @@
+
+config interface 'loopback'
+	option ifname 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option packet_steering '0'
+
+config interface 'lan'
+	option type 'bridge'
+	option ifname 'eth0 eth2 eth3'
+	option proto 'static'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+	option ipaddr '10.0.0.1'
+
+config device 'lan_eth0_dev'
+	option name 'eth0'
+	option macaddr '8e:c0:42:98:a4:48'
+
+config device 'lan_eth2_dev'
+	option name 'eth2'
+	option macaddr '8e:c0:42:98:a4:48'
+
+config device 'lan_eth3_dev'
+	option name 'eth3'
+	option macaddr '8e:c0:42:98:a4:48'
+
+config interface 'wan'
+	option ifname 'eth1'
+	option _orig_ifname 'eth1'
+	option _orig_bridge 'false'
+	option proto 'pppoe'
+	option username 'CD0283394385320@SP'
+	option password 'CD0283394385320'
+	option ipv6 'auto'
+	option keepalive '0'
+
+config device 'wan_eth1_dev'
+	option name 'eth1'
+	option macaddr '8e:c0:42:98:a4:47'
+
+config interface 'wan6'
+	option ifname 'eth1'
+	option proto 'dhcpv6'
+
+config interface 'docker'
+	option ifname 'docker0'
+	option proto 'none'
+	option auto '0'
+
+config device
+	option type 'bridge'
+	option name 'docker0'
+
+config interface 'ipsec_server'
+	option ifname 'ipsec0'
+	option device 'ipsec0'
+	option proto 'static'
+	option netmask '255.255.255.0'
+	option ipaddr '10.0.0.1'
+
+config interface 'modem'
+	option proto 'static'
+	option ifname 'eth1'
+	option ipaddr '192.168.1.11'
+	option netmask '255.255.255.0'
+	option gateway '192.168.1.1'
+
+config interface 'vpn0'
+	option ifname 'tun0'
+	option proto 'none'
+

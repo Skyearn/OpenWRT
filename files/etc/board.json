@@ -1,0 +1,22 @@
+{
+	"model": {
+		"id": "rockchip,rk3568-lunzn-r68s",
+		"name": "FastRhino R68S"
+	},
+	"network": {
+		"lan": {
+			"ports": [
+				"eth0",
+				"eth2",
+				"eth3"
+			],
+			"protocol": "static",
+			"macaddr": "8e:c0:42:98:a4:47"
+		},
+		"wan": {
+			"ifname": "eth1",
+			"protocol": "dhcp",
+			"macaddr": "8e:c0:42:98:a4:48"
+		}
+	}
+}
