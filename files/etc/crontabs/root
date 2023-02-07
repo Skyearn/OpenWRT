@@ -1,3 +1,0 @@
-*/40 * * * * /etc/init.d/frp restart
-58 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null
-0 3 * * * lua /usr/share/passwall/subscribe.lua start cfg0f8b02,cfg108b02,cfg118b02 > /dev/null 2>&1 &
