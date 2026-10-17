@@ -1,26 +1,37 @@
-**English** | [中文](https://p3terx.com/archives/build-openwrt-with-github-actions.html)
-
 # Actions-OpenWrt
 
-[![LICENSE](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square&label=LICENSE)](https://github.com/P3TERX/Actions-OpenWrt/blob/master/LICENSE)
-![GitHub Stars](https://img.shields.io/github/stars/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Stars&logo=github)
-![GitHub Forks](https://img.shields.io/github/forks/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Forks&logo=github)
+Build OpenWrt firmware with GitHub Actions, based on
+[P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt).
 
-A template for building OpenWrt with GitHub Actions
+Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`)
+
+## Devices
+
+| Device | Config file | Target |
+| --- | --- | --- |
+| R68S | `R68S.config` | `rockchip/armv8` (`fastrhino_r68s`) |
+| K3 | `K3.config` | `bcm53xx/generic` (`phicomm_k3`) |
 
 ## Usage
 
-- Click the [Use this template](https://github.com/P3TERX/Actions-OpenWrt/generate) button to create a new repository.
-- Generate `.config` files using [Lean's OpenWrt](https://github.com/coolsnowwolf/lede) source code. ( You can change it through environment variables in the workflow file. )
-- Push `.config` file to the GitHub repository.
-- Select `Build OpenWrt` on the Actions page.
-- Click the `Run workflow` button.
-- When the build is complete, click the `Artifacts` button in the upper right corner of the Actions page to download the binaries.
+- Go to **Actions** → **OpenWrt Builder** → **Run workflow**, then pick
+  `all` (default), `R68S` or `K3`.
+- The firmware is uploaded both as a workflow artifact and as a GitHub release
+  tagged `YYYY.MM.DD-HHMM-<DEVICE>`.
+- The newest 2 workflow runs and newest 4 releases are kept.
 
-## Tips
+## Notes
 
-- It may take a long time to create a `.config` file and build the OpenWrt firmware. Thus, before create repository to build your own firmware, you may check out if others have already built it which meet your needs by simply [search `Actions-Openwrt` in GitHub](https://github.com/search?q=Actions-openwrt).
-- Add some meta info of your built firmware (such as firmware architecture and installed packages) to your repository introduction, this will save others' time.
+- The workflow requests `contents: write` and `actions: write`. The repository
+  default token permission is read-only, so without them the release upload
+  fails with `Resource not accessible by integration` (403).
+- `diy-part1.sh` only appends the `helloworld` feed when lede does not already
+  ship it. lede ships it in `feeds.conf.default`, and a duplicate feed name
+  aborts `./scripts/feeds update -a` with exit code 25.
+- `luci-app-easymesh` and `luci-app-guest-wifi` (referenced by the configs) are
+  not part of the enabled feeds — they live in `kenzok8/openwrt-packages`.
+  `make defconfig` silently drops them, so the firmware will not include those
+  two apps unless that feed is added.
 
 ## Credits
 
@@ -28,12 +39,10 @@ A template for building OpenWrt with GitHub Actions
 - [GitHub Actions](https://github.com/features/actions)
 - [OpenWrt](https://github.com/openwrt/openwrt)
 - [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)
-- [Mikubill/transfer](https://github.com/Mikubill/transfer)
 - [softprops/action-gh-release](https://github.com/softprops/action-gh-release)
-- [Mattraks/delete-workflow-runs](https://github.com/Mattraks/delete-workflow-runs)
-- [dev-drprasad/delete-older-releases](https://github.com/dev-drprasad/delete-older-releases)
 - [peter-evans/repository-dispatch](https://github.com/peter-evans/repository-dispatch)
+- [P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)
 
 ## License
 
-[MIT](https://github.com/P3TERX/Actions-OpenWrt/blob/main/LICENSE) © [**P3TERX**](https://p3terx.com)
+[MIT](LICENSE) © [**P3TERX**](https://p3terx.com)

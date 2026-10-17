@@ -14,5 +14,10 @@
 #sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
 
 # Add a feed source
-echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.default
+# NOTE: coolsnowwolf/lede already ships `src-git helloworld ...` in
+# feeds.conf.default. Appending it again makes `./scripts/feeds update -a`
+# fail with "Duplicate feed name 'helloworld'" (exit code 25), so only add it
+# when it is really missing.
+grep -q '^src-git helloworld' feeds.conf.default || \
+  echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.default
 #echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
