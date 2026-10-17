@@ -19,11 +19,12 @@
 #     lan) ipad=${ipaddr:-"192.168.1.1"}
 # so the old P3TERX "s/OpenWrt/..." example no longer matches anything.
 #
-# The workflow exports DEVICE (R68S / K3), so the hostname and the LAN address
-# are chosen per device.  This changes the default for a *fresh* configuration;
-# flashing with "keep settings" keeps the previous address/hostname.
+# The workflow exports DEVICE (R68S / K3), so the LAN address is chosen per
+# device while the hostname is shared.  This changes the default for a *fresh*
+# configuration; flashing with "keep settings" keeps the previous
+# address/hostname.
 # ---------------------------------------------------------------------------
-ROUTER_HOSTNAME="${DEVICE:-OpenWrt}"
+ROUTER_HOSTNAME="Al"
 
 case "${DEVICE}" in
 	K3)   ROUTER_LAN_IP="10.0.0.254" ;;

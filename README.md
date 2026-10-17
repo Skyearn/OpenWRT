@@ -41,11 +41,16 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
 
 ### Default hostname and LAN address
 
-Edit the two variables at the top of `diy-part2.sh`:
+Edit the variables at the top of `diy-part2.sh`:
 
 ```sh
-ROUTER_HOSTNAME="${DEVICE:-OpenWrt}"   # becomes R68S / K3 in the workflow
-ROUTER_LAN_IP="192.168.1.1"            # e.g. 192.168.50.1
+ROUTER_HOSTNAME="Al"          # shared by both images
+
+case "${DEVICE}" in
+	K3)   ROUTER_LAN_IP="10.0.0.254" ;;
+	R68S) ROUTER_LAN_IP="10.0.0.1" ;;
+	*)    ROUTER_LAN_IP="192.168.1.1" ;;
+esac
 ```
 
 The script rewrites `package/base-files/files/bin/config_generate` before the
