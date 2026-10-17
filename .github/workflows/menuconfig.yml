@@ -1,0 +1,136 @@
+#
+# Interactive menuconfig over SSH (tmate)
+#
+# Run this workflow, then open the SSH / web address printed in the
+# "Start SSH session" step log and run:
+#
+#     cd openwrt
+#     make menuconfig
+#     exit
+#
+# When the session ends this workflow exports `./scripts/diffconfig.sh` (the
+# compact "only non-default symbols" config), prints it in the log and uploads
+# it as an artifact, so it can be pasted straight into R68S.config / K3.config.
+#
+
+name: Menuconfig (SSH)
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: 'Device config to start from'
+        required: true
+        default: R68S
+        type: choice
+        options:
+          - R68S
+          - K3
+      minutes:
+        description: 'Session timeout (minutes)'
+        required: true
+        default: '60'
+        type: choice
+        options:
+          - '30'
+          - '60'
+          - '90'
+          - '120'
+
+permissions:
+  contents: read
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  DEVICE: ${{ github.event.inputs.device }}
+
+jobs:
+  menuconfig:
+    name: Menuconfig ${{ github.event.inputs.device }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone Asia/Shanghai
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+    - name: Clone source code
+      working-directory: /workdir
+      run: |
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+    - name: Load custom feeds
+      run: |
+        chmod +x diy-part1.sh
+        cd openwrt
+        "$GITHUB_WORKSPACE/diy-part1.sh"
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
+
+    - name: Load custom configuration
+      run: |
+        [ -e "$DEVICE.config" ] || { echo "::error::$DEVICE.config not found"; exit 1; }
+        cp "$DEVICE.config" openwrt/.config
+        chmod +x diy-part2.sh
+        cd openwrt
+        "$GITHUB_WORKSPACE/diy-part2.sh"
+        make defconfig
+
+    - name: How to use this session
+      run: |
+        cat <<EOF
+        ======================================================================
+         The next step prints an SSH command and a web terminal URL.
+         Connect to it (only the workflow initiator can log in), then run:
+
+             cd openwrt
+             make menuconfig
+             exit
+
+         Exiting the shell ends the session. Afterwards this job prints the
+         diffconfig output and uploads it as an artifact, ready to paste
+         into ${DEVICE}.config.
+        ======================================================================
+        EOF
+
+    - name: Start SSH session
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: ${{ fromJSON(github.event.inputs.minutes) }}
+      with:
+        limit-access-to-actor: true
+        install-dependencies: true
+
+    - name: Export effective configuration
+      if: always()
+      run: |
+        cd openwrt
+        ./scripts/diffconfig.sh > "$GITHUB_WORKSPACE/diffconfig-${DEVICE}.txt" || true
+        echo "===== diffconfig (paste into ${DEVICE}.config) ====="
+        cat "$GITHUB_WORKSPACE/diffconfig-${DEVICE}.txt" || true
+
+    - name: Upload diffconfig
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: diffconfig-${{ github.event.inputs.device }}
+        path: diffconfig-${{ github.event.inputs.device }}.txt
+        if-no-files-found: warn

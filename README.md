@@ -20,6 +20,25 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
   tagged `YYYY.MM.DD-HHMM-<DEVICE>`.
 - The newest 2 workflow runs and newest 4 releases are kept.
 
+### Interactive configuration (menuconfig over SSH)
+
+- **Actions** → **Menuconfig (SSH)** → **Run workflow**, pick `R68S` or `K3`
+  and a session timeout.
+- Wait for the `Start SSH session` step to print the `ssh ...@....tmate.io`
+  address and the `https://tmate.io/t/...` web terminal URL, then connect.
+  Only the workflow initiator can log in.
+- In the session:
+
+  ```sh
+  cd openwrt
+  make menuconfig
+  exit
+  ```
+
+- The job then runs `./scripts/diffconfig.sh`, prints the compact config in the
+  log and uploads it as the `diffconfig-<DEVICE>` artifact. Paste that into
+  `R68S.config` / `K3.config` and run **OpenWrt Builder**.
+
 ## Notes
 
 - The workflow requests `contents: write` and `actions: write`. The repository
