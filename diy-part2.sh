@@ -19,23 +19,20 @@
 #     lan) ipad=${ipaddr:-"192.168.1.1"}
 # so the old P3TERX "s/OpenWrt/..." example no longer matches anything.
 #
-# The workflow exports DEVICE (R68S / K3), so each image automatically gets its
-# own hostname.  Change ROUTER_LAN_IP (and ROUTER_HOSTNAME if you like) here,
-# then run the OpenWrt Builder workflow again.
-#
-# Per-device values are possible too, e.g.:
-#     case "${DEVICE}" in
-#       K3)   ROUTER_LAN_IP="192.168.50.2" ;;
-#       R68S) ROUTER_LAN_IP="192.168.50.1" ;;
-#     esac
+# The workflow exports DEVICE (R68S / K3), so the hostname and the LAN address
+# are chosen per device.  This changes the default for a *fresh* configuration;
+# flashing with "keep settings" keeps the previous address/hostname.
 # ---------------------------------------------------------------------------
+ROUTER_HOSTNAME="${DEVICE:-OpenWrt}"
 
 case "${DEVICE}" in
 	K3)   ROUTER_LAN_IP="10.0.0.254" ;;
 	R68S) ROUTER_LAN_IP="10.0.0.1" ;;
+	*)    ROUTER_LAN_IP="192.168.1.1" ;;
 esac
 
-sed -i "s/hostname='Al'/hostname='${ROUTER_HOSTNAME}'/" package/base-files/files/bin/config_generate
+sed -i "s/hostname='LEDE'/hostname='${ROUTER_HOSTNAME}'/" package/base-files/files/bin/config_generate
+sed -i "s/192\.168\.1\.1/${ROUTER_LAN_IP}/g"         package/base-files/files/bin/config_generate
 
 # Modify default theme
 #sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
