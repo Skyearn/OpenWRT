@@ -19,17 +19,25 @@
 #     lan) ipad=${ipaddr:-"192.168.1.1"}
 # so the old P3TERX "s/OpenWrt/..." example no longer matches anything.
 #
-# The workflow exports DEVICE (R68S / K3), so the LAN address is chosen per
-# device while the hostname is shared.  This changes the default for a *fresh*
+# The workflow exports DEVICE (R68S / K3), so both the hostname and the LAN
+# address are chosen per device, with the upstream defaults as the fallback for
+# builds outside the workflow.  This changes the default for a *fresh*
 # configuration; flashing with "keep settings" keeps the previous
 # address/hostname.
 # ---------------------------------------------------------------------------
-ROUTER_HOSTNAME="Al"
-
 case "${DEVICE}" in
-	K3)   ROUTER_LAN_IP="10.0.0.254" ;;
-	R68S) ROUTER_LAN_IP="10.0.0.1" ;;
-	*)    ROUTER_LAN_IP="192.168.1.1" ;;
+	K3)
+		ROUTER_HOSTNAME="Al"
+		ROUTER_LAN_IP="10.0.0.254"
+		;;
+	R68S)
+		ROUTER_HOSTNAME="Al"
+		ROUTER_LAN_IP="10.0.0.1"
+		;;
+	*)
+		ROUTER_HOSTNAME="LEDE"
+		ROUTER_LAN_IP="192.168.1.1"
+		;;
 esac
 
 sed -i "s/hostname='LEDE'/hostname='${ROUTER_HOSTNAME}'/" package/base-files/files/bin/config_generate

@@ -41,15 +41,22 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
 
 ### Default hostname and LAN address
 
-Edit the variables at the top of `diy-part2.sh`:
+Edit the `case` block at the top of `diy-part2.sh`:
 
 ```sh
-ROUTER_HOSTNAME="Al"          # shared by both images
-
 case "${DEVICE}" in
-	K3)   ROUTER_LAN_IP="10.0.0.254" ;;
-	R68S) ROUTER_LAN_IP="10.0.0.1" ;;
-	*)    ROUTER_LAN_IP="192.168.1.1" ;;
+	K3)
+		ROUTER_HOSTNAME="Al"
+		ROUTER_LAN_IP="10.0.0.254"
+		;;
+	R68S)
+		ROUTER_HOSTNAME="Al"
+		ROUTER_LAN_IP="10.0.0.1"
+		;;
+	*)
+		ROUTER_HOSTNAME="LEDE"
+		ROUTER_LAN_IP="192.168.1.1"
+		;;
 esac
 ```
 
