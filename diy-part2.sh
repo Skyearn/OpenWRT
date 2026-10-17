@@ -18,3 +18,31 @@
 
 # Modify hostname
 #sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
+
+# ---------------------------------------------------------------------------
+# brcmfmac (used by the K3 image) does not compile against Linux 6.6.157+.
+#
+# Linux 6.6.157 backported the removal of struct usb_driver.drvwrap (the same
+# change landed in 6.8), so the driver now has to use usb_driver.driver
+# directly. backports-6.6.15 (the version lede uses for kernel 6.6) only
+# handles kernels >= 6.8 in patch 221-brcmfmac_usb_driver_backport.patch, which
+# makes brcmfmac/usb.c fail with:
+#   error: 'struct usb_driver' has no member named 'drvwrap'
+# Broaden that version check so the >= 6.6.157 kernels take the new path.
+# The patch dir is called "patchs" (sic) for the 6.6 backports in lede.
+# ---------------------------------------------------------------------------
+if [ -d package/kernel/mac80211/patchs ]; then
+	cat > package/kernel/mac80211/patchs/222-brcmfmac_usb_driver_6.6.157.patch <<'PATCH'
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+@@ -1581,7 +1581,7 @@
+ 
+ void brcmf_usb_exit(void)
+ {
+-#if LINUX_VERSION_IS_GEQ(6,8,0)
++#if LINUX_VERSION_IS_GEQ(6,6,157) || LINUX_VERSION_IS_GEQ(6,8,0)
+ 	struct device_driver *drv = &brcmf_usbdrvr.driver;
+ #else
+ 	struct device_driver *drv = &brcmf_usbdrvr.drvwrap.driver;
+PATCH
+fi

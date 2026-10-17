@@ -32,6 +32,13 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
   not part of the enabled feeds — they live in `kenzok8/openwrt-packages`.
   `make defconfig` silently drops them, so the firmware will not include those
   two apps unless that feed is added.
+- NaiveProxy is disabled in `R68S.config`: it needs the host package `gn`,
+  whose 2026-09-02 revision uses C++20 ranges that do not compile with the
+  GCC 12 toolchain of `ubuntu-22.04`. Everything else in passwall is built.
+- `diy-part2.sh` injects a patch for `brcmfmac`: Linux 6.6.157 backported the
+  removal of `struct usb_driver.drvwrap`, which backports-6.6.15 (kernel 6.6
+  in lede) does not expect, so the K3 image would fail with
+  `'struct usb_driver' has no member named 'drvwrap'`.
 
 ## Credits
 
