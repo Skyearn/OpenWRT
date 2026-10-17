@@ -29,11 +29,13 @@
 #       R68S) ROUTER_LAN_IP="192.168.50.1" ;;
 #     esac
 # ---------------------------------------------------------------------------
-ROUTER_HOSTNAME="${DEVICE:-OpenWrt}"
-ROUTER_LAN_IP="192.168.1.1"
 
-sed -i "s/hostname='LEDE'/hostname='${ROUTER_HOSTNAME}'/" package/base-files/files/bin/config_generate
-sed -i "s/192\.168\.1\.1/${ROUTER_LAN_IP}/g" package/base-files/files/bin/config_generate
+case "${DEVICE}" in
+	K3)   ROUTER_LAN_IP="10.0.0.254" ;;
+	R68S) ROUTER_LAN_IP="10.0.0.1" ;;
+esac
+
+sed -i "s/hostname='Al'/hostname='${ROUTER_HOSTNAME}'/" package/base-files/files/bin/config_generate
 
 # Modify default theme
 #sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
