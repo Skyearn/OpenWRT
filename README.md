@@ -28,10 +28,14 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
 - `diy-part1.sh` only appends the `helloworld` feed when lede does not already
   ship it. lede ships it in `feeds.conf.default`, and a duplicate feed name
   aborts `./scripts/feeds update -a` with exit code 25.
-- `luci-app-easymesh` and `luci-app-guest-wifi` (referenced by the configs) are
-  not part of the enabled feeds — they live in `kenzok8/openwrt-packages`.
-  `make defconfig` silently drops them, so the firmware will not include those
-  two apps unless that feed is added.
+- `luci-app-easymesh` and `luci-app-guest-wifi` were dropped from the configs:
+  they are not part of the enabled feeds (they live in
+  `kenzok8/openwrt-packages`, which conflicts with the current feeds).
+- The configs are fragments (`make defconfig` fills in the defaults), and only
+  symbols that exist in the current feeds are kept. Old entries such as
+  `luci-app-turboacc_INCLUDE_*`, `luci-i18n-mwan3-zh-cn`,
+  `luci-app-unblockmusic`, and the `lib*`/`kmod-*`/`boost-*` dependency noise
+  were removed.
 - NaiveProxy is disabled in `R68S.config`: it needs the host package `gn`,
   whose 2026-09-02 revision uses C++20 ranges that do not compile with the
   GCC 12 toolchain of `ubuntu-22.04`. Everything else in passwall is built.
@@ -39,6 +43,9 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
   removal of `struct usb_driver.drvwrap`, which backports-6.6.15 (kernel 6.6
   in lede) does not expect, so the K3 image would fail with
   `'struct usb_driver' has no member named 'drvwrap'`.
+- The K3 build used to pull `boost`, whose SourceForge mirror stalls for an
+  hour or more; `boost` and the other old dependency entries are gone, and the
+  download step is capped at 90 minutes.
 
 ## Credits
 

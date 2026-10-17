@@ -131,6 +131,9 @@ jobs:
 
     - name: Download package
       id: package
+      # Some mirrors (SourceForge, vendor sites) can stall for a very long
+      # time; do not let one dead mirror eat the whole job budget.
+      timeout-minutes: 90
       run: |
         cd openwrt
         make defconfig
@@ -138,7 +141,7 @@ jobs:
           echo "::error::no target selected by 'make defconfig', refuse to build an empty image"
           exit 1
         fi
-        make download -j8 || make download -j4 || make download -j1 V=s
+        make download -j$(nproc) || make download -j1 V=s
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
