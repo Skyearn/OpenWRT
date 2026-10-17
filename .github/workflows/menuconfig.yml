@@ -103,13 +103,18 @@ jobs:
 
              ssh <session>:<token>@uptermd.upterm.dev
 
-         Only the workflow initiator (your GitHub SSH key) can log in.
-         Connect with it and run:
+         Only the GitHub SSH keys of the workflow initiator are authorized.
+         If your client does not offer that key by default, force it:
+
+             ssh -i ~/.ssh/id_ed25519 <session>:<token>@uptermd.upterm.dev
+
+         Then run:
 
              cd openwrt
              make menuconfig
              exit
 
+         A plain (interactive) ssh allocates the PTY menuconfig needs.
          Exiting the shell ends the session. Afterwards this job prints the
          diffconfig output and uploads it as an artifact, ready to paste
          into ${DEVICE}.config.
