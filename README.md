@@ -39,6 +39,24 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
   log and uploads it as the `diffconfig-<DEVICE>` artifact. Paste that into
   `R68S.config` / `K3.config` and run **OpenWrt Builder**.
 
+### Default hostname and LAN address
+
+Edit the two variables at the top of `diy-part2.sh`:
+
+```sh
+ROUTER_HOSTNAME="${DEVICE:-OpenWrt}"   # becomes R68S / K3 in the workflow
+ROUTER_LAN_IP="192.168.1.1"            # e.g. 192.168.50.1
+```
+
+The script rewrites `package/base-files/files/bin/config_generate` before the
+image is built. Current lede uses `LEDE` as the default hostname and
+`192.168.1.1` as the LAN address, which is why the old P3TERX
+`s/OpenWrt/.../` example no longer matches anything.
+
+Note that these are *defaults for a fresh configuration*: `config_generate`
+only runs when `/etc/config/network` or `/etc/config/system` do not exist yet,
+so flashing with "keep settings" keeps the previous address/hostname.
+
 ## Notes
 
 - The workflow requests `contents: write` and `actions: write`. The repository

@@ -10,14 +10,33 @@
 # See /LICENSE for more information.
 #
 
-# Modify default IP
-#sed -i 's/192.168.1.1/192.168.50.5/g' package/base-files/files/bin/config_generate
+# ---------------------------------------------------------------------------
+# Default hostname and LAN address baked into the image.
+#
+# These are written by package/base-files/files/bin/config_generate on first
+# boot.  Current lede uses
+#     set system.@system[-1].hostname='LEDE'
+#     lan) ipad=${ipaddr:-"192.168.1.1"}
+# so the old P3TERX "s/OpenWrt/..." example no longer matches anything.
+#
+# The workflow exports DEVICE (R68S / K3), so each image automatically gets its
+# own hostname.  Change ROUTER_LAN_IP (and ROUTER_HOSTNAME if you like) here,
+# then run the OpenWrt Builder workflow again.
+#
+# Per-device values are possible too, e.g.:
+#     case "${DEVICE}" in
+#       K3)   ROUTER_LAN_IP="192.168.50.2" ;;
+#       R68S) ROUTER_LAN_IP="192.168.50.1" ;;
+#     esac
+# ---------------------------------------------------------------------------
+ROUTER_HOSTNAME="${DEVICE:-OpenWrt}"
+ROUTER_LAN_IP="192.168.1.1"
+
+sed -i "s/hostname='LEDE'/hostname='${ROUTER_HOSTNAME}'/" package/base-files/files/bin/config_generate
+sed -i "s/192\.168\.1\.1/${ROUTER_LAN_IP}/g" package/base-files/files/bin/config_generate
 
 # Modify default theme
 #sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
-
-# Modify hostname
-#sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
 
 # ---------------------------------------------------------------------------
 # brcmfmac (used by the K3 image) does not compile against Linux 6.6.157+.
