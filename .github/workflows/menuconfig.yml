@@ -99,8 +99,12 @@ jobs:
       run: |
         cat <<EOF
         ======================================================================
-         The next step prints an SSH command and a web terminal URL.
-         Connect to it (only the workflow initiator can log in), then run:
+         The next step prints an SSH command like:
+
+             ssh <session>:<token>@uptermd.upterm.dev
+
+         Only the workflow initiator (your GitHub SSH key) can log in.
+         Connect with it and run:
 
              cd openwrt
              make menuconfig
@@ -113,11 +117,11 @@ jobs:
         EOF
 
     - name: Start SSH session
-      uses: mxschmitt/action-tmate@v3
+      uses: owenthereal/action-upterm@v2
       timeout-minutes: ${{ fromJSON(github.event.inputs.minutes) }}
       with:
         limit-access-to-actor: true
-        install-dependencies: true
+        wait-timeout-minutes: 20
 
     - name: Export effective configuration
       if: always()

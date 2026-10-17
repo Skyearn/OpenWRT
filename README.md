@@ -24,9 +24,9 @@ Source tree: [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede) (`master`
 
 - **Actions** → **Menuconfig (SSH)** → **Run workflow**, pick `R68S` or `K3`
   and a session timeout.
-- Wait for the `Start SSH session` step to print the `ssh ...@....tmate.io`
-  address and the `https://tmate.io/t/...` web terminal URL, then connect.
-  Only the workflow initiator can log in.
+- Wait for the `Start SSH session` step to print a command like
+  `ssh <session>:<token>@uptermd.upterm.dev`, then connect with it in your
+  terminal. Only the workflow initiator's GitHub SSH keys are authorized.
 - In the session:
 
   ```sh
